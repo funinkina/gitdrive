@@ -1,7 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { createRepository } from "./actions";
+import { useActionState } from "react";
 
 export default function OnboardingPage() {
+    const [state, formAction, isPending] = useActionState(createRepository, null);
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-24">
             <div className="w-full max-w-md p-8 rounded-lg shadow-md border">
@@ -10,7 +15,7 @@ export default function OnboardingPage() {
                     Create a private GitHub repository to store your files.
                 </p>
 
-                <form action={createRepository} className="space-y-4">
+                <form action={formAction} className="space-y-4">
                     <div>
                         <label htmlFor="repoName" className="block text-sm font-medium text-gray-700 mb-1">
                             Repository Name
@@ -27,8 +32,14 @@ export default function OnboardingPage() {
                         />
                     </div>
 
-                    <Button type="submit" className="w-full">
-                        Create Repository
+                    {state?.error && (
+                        <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md border border-red-200">
+                            {state.error}
+                        </div>
+                    )}
+
+                    <Button type="submit" className="w-full" disabled={isPending}>
+                        {isPending ? "Creating..." : "Create Repository"}
                     </Button>
                 </form>
             </div>
