@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { SignIn, SignOut } from "@/components/auth-buttons";
+import { UploadZone } from "@/components/upload-zone";
 import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -57,8 +58,9 @@ export default async function Home() {
           <div className="col-span-4 p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-semibold mb-4">Welcome back!</h2>
             <p className="mb-4">You are logged in. Your drive is ready.</p>
+            <UploadZone />
             {/* Drive interface will go here */}
-            <div className="p-4 border border-dashed border-gray-300 rounded text-gray-500">
+            <div className="p-4 border border-dashed border-gray-300 rounded text-gray-500 mt-8">
               Drive contents will appear here.
             </div>
           </div>
