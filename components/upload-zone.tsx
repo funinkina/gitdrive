@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from "react";
 import { Upload, File as FileIcon, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function UploadZone() {
+export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void }) {
     const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -49,6 +49,9 @@ export function UploadZone() {
             }
 
             setStatus({ type: "success", message: "File uploaded successfully!" });
+            if (onUploadComplete) {
+                onUploadComplete();
+            }
         } catch (error: any) {
             setStatus({ type: "error", message: error.message });
         } finally {
@@ -79,11 +82,9 @@ export function UploadZone() {
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
-                className={`
-          relative border-2 border-dashed rounded-xl p-12 text-center transition-colors
-          ${isDragging
-                        ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                        : "border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600"
+                className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-colors ${isDragging
+                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
+                    : "border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600"
                     }
         `}
             >
@@ -124,8 +125,8 @@ export function UploadZone() {
 
             {status && (
                 <div className={`mt-4 p-4 rounded-lg flex items-center gap-2 ${status.type === "success"
-                        ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                        : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                    ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                    : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
                     }`}>
                     {status.type === "success" ? (
                         <CheckCircle className="w-5 h-5" />
