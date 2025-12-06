@@ -1,9 +1,21 @@
 import { auth } from "@/lib/auth";
 import { SignIn, SignOut } from "@/components/auth-buttons";
 import Image from "next/image";
+import { prisma } from "@/lib/db";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
+
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (user && !user.repoName) {
+      redirect("/onboarding");
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-24">

@@ -1,51 +1,14 @@
-import mongoose from 'mongoose';
+import { PrismaClient } from "@prisma/client"
+import { Pool } from "pg"
+import { PrismaPg } from "@prisma/adapter-pg"
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-if (!MONGODB_URI) {
-    throw new Error(
-        'Please define the MONGODB_URI environment variable inside .env.local'
-    );
-}
+const connectionString = process.env.DATABASE_URL
 
-interface MongooseCache {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
-}
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
 
-declare global {
-    var mongoose: MongooseCache;
-}
+export const prisma = globalForPrisma.prisma || new PrismaClient({ adapter })
 
-let cached = global.mongoose;
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
-}
-
-async function connectDB() {
-    if (cached.conn) {
-        return cached.conn;
-    }
-
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-        };
-
-        cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-            return mongoose;
-        });
-    }
-
-    try {
-        cached.conn = await cached.promise;
-    } catch (e) {
-        cached.promise = null;
-        throw e;
-    }
-
-    return cached.conn;
-}
-
-export default connectDB;
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
