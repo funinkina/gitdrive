@@ -5,7 +5,6 @@ import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { GitBranch } from "lucide-react";
 
 export default async function Home() {
   const session = await auth();
@@ -67,82 +66,62 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <Image
-                src="/logo.svg"
-                alt="GitDrive"
-                width={32}
-                height={32}
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <main className="w-full max-w-4xl flex flex-col items-center text-center space-y-16">
+
+        {/* Logo Section */}
+        <div className="flex flex-col items-center space-y-6">
+          <div className="w-24 h-24 flex items-center justify-center">
+            <Image src="/logo.svg" alt="GitDrive" width={128} height={128} />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-5xl font-bold tracking-tight">GitDrive</h1>
+            <p className="text-muted-foreground text-lg">Your GitHub repositories as free cloud storage.</p>
+          </div>
+        </div>
+
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+          <div className="bg-muted/30 border border-border rounded-lg p-4 h-32 flex flex-col justify-between text-left hover:bg-muted/50 transition-colors">
+            <span className="text-xl font-light">Free?</span>
+            <span className="text-xl font-semibold self-end">Yes!</span>
+          </div>
+          <div className="bg-muted/30 border border-border rounded-lg p-4 h-32 flex flex-col justify-between text-left hover:bg-muted/50 transition-colors">
+            <span className="text-xl font-light">Storage?</span>
+            <span className="text-xl font-semibold self-end">1Gb only</span>
+          </div>
+          <div className="bg-muted/30 border border-border rounded-lg p-4 h-32 flex flex-col justify-between text-left hover:bg-muted/50 transition-colors">
+            <span className="text-xl font-light">Search?</span>
+            <div className="flex flex-col items-end">
+              <span className="text-xl font-semibold">Semantic</span>
+              <span className="text-xl font-semibold">& fast</span>
+            </div>
+          </div>
+          <div className="bg-muted/30 border border-border rounded-lg p-4 h-32 flex flex-col justify-between text-left hover:bg-muted/50 transition-colors">
+            <span className="text-xl font-light">Why?</span>
+            <span className="text-xl font-semibold self-end">why not?</span>
+          </div>
+        </div>
+
+        {/* Login Button */}
+        <form
+          action={async () => {
+            "use server";
+            await signIn("github");
+          }}
+        >
+          <Button size="lg" className="gap-4 px-4 py-6 text-lg font-medium bg-[#1e293b] hover:bg-[#0f172a] text-white">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.868-.013-1.703-2.782.603-3.369-1.343-3.369-1.343-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.547 2.91 1.186.092-.923.35-1.546.636-1.903-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.817c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.138 18.193 20 14.431 20 10.017 20 4.484 15.522 0 10 0z"
+                clipRule="evenodd"
               />
-            </div>
-            <span className="text-xl font-semibold text-foreground">GitDrive</span>
-          </div>
-        </div>
-      </header>
+            </svg>
+            Login with GitHub
+          </Button>
+        </form>
 
-      {/* Hero Section */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-2xl w-full text-center">
-          {/* Logo and Name */}
-          <div className="mb-12">
-            <div className="inline-flex items-center justify-center mb-6">
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center">
-                <Image
-                  src="/logo.svg"
-                  alt="GitDrive"
-                  width={128}
-                  height={128}
-                />
-              </div>
-            </div>
-            <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-4 tracking-tight">GitDrive</h1>
-            <p className="text-lg text-muted-foreground">Your GitHub repositories as cloud storage</p>
-          </div>
-
-          {/* Description */}
-          <div className="mb-12 space-y-4">
-            <p className="text-base text-muted-foreground leading-relaxed">
-              Transform your GitHub repositories into powerful cloud storage. Store files, sync seamlessly, and access
-              everything from anywhere with the simplicity and security of GitHub.
-            </p>
-            <p className="text-base text-muted-foreground leading-relaxed">
-              GitDrive leverages the reliability of GitHub infrastructure to give you unlimited storage backed by the
-              world's leading developer platform. No additional servers, no complex setup—just your code and files in
-              one place.
-            </p>
-          </div>
-
-          {/* CTA Button */}
-          <div className="mb-8">
-            <form
-              action={async () => {
-                "use server";
-                await signIn("github");
-              }}
-            >
-              <Button size="lg" className="gap-2 px-8 py-6 text-base font-medium">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.868-.013-1.703-2.782.603-3.369-1.343-3.369-1.343-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.547 2.91 1.186.092-.923.35-1.546.636-1.903-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0110 4.817c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.138 18.193 20 14.431 20 10.017 20 4.484 15.522 0 10 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Login with GitHub
-              </Button>
-            </form>
-          </div>
-
-          {/* Trust Badge */}
-          <div className="pt-8 border-t border-border">
-            <p className="text-sm text-muted-foreground">Secure • Unlimited Storage • Built on GitHub</p>
-          </div>
-        </div>
       </main>
     </div>
   );

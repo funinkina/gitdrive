@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { DM_Sans } from "next/font/google"
 import "./globals.css"
 
-const _DM_Sans = DM_Sans({ subsets: ["latin"], weight: ["400", "600"] })
+const _DM_Sans = DM_Sans({ subsets: ["latin"], weight: ["100", "200", "300", "400", "500", "600", "700"] })
 
 export const metadata: Metadata = {
   title: "GitDrive - GitHub as Cloud Storage",
