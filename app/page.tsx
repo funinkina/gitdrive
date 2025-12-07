@@ -27,10 +27,13 @@ export default async function Home() {
         <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <GitBranch className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-semibold text-foreground">GitDrive</span>
+              <Image
+                src="/logo.svg"
+                alt="GitDrive"
+                width={32}
+                height={32}
+              />
+              <span className="text-xl font-semibold text-foreground">GitDrive</span>
             </div>
 
             <div className="flex items-center gap-4">
@@ -69,10 +72,15 @@ export default async function Home() {
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <GitBranch className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+              <Image
+                src="/logo.svg"
+                alt="GitDrive"
+                width={32}
+                height={32}
+              />
             </div>
-            <span className="text-lg font-semibold text-foreground">GitDrive</span>
+            <span className="text-xl font-semibold text-foreground">GitDrive</span>
           </div>
         </div>
       </header>
@@ -83,8 +91,13 @@ export default async function Home() {
           {/* Logo and Name */}
           <div className="mb-12">
             <div className="inline-flex items-center justify-center mb-6">
-              <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center">
-                <GitBranch className="w-10 h-10 text-primary-foreground" />
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center">
+                <Image
+                  src="/logo.svg"
+                  alt="GitDrive"
+                  width={128}
+                  height={128}
+                />
               </div>
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold text-foreground mb-4 tracking-tight">GitDrive</h1>
