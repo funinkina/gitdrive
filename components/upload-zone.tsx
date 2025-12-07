@@ -1,26 +1,17 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
-import { Upload, File as FileIcon, Loader2, CheckCircle, XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Upload, Loader2, CheckCircle, XCircle } from "lucide-react";
 
 export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void }) {
     const [isDragging, setIsDragging] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const dragCounter = useRef(0);
 
-    const onDragOver = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    }, []);
-
-    const onDragLeave = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-    }, []);
-
-    const uploadFile = async (file: File) => {
+    const uploadFile = useCallback(async (file: File) => {
         setUploading(true);
         setStatus(null);
 
@@ -34,8 +25,6 @@ export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void
             const formData = new FormData();
             formData.append("file", file);
             formData.append("sha256", sha256);
-            // Optional: Add tags input later
-            // formData.append("tags", "web-upload");
 
             const res = await fetch("/api/upload", {
                 method: "POST",
@@ -52,22 +41,66 @@ export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void
             if (onUploadComplete) {
                 onUploadComplete();
             }
-        } catch (error: any) {
-            setStatus({ type: "error", message: error.message });
+
+            // Clear status after 3 seconds
+            setTimeout(() => setStatus(null), 3000);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            setStatus({ type: "error", message });
+            setTimeout(() => setStatus(null), 5000);
         } finally {
             setUploading(false);
         }
-    };
+    }, [onUploadComplete]);
 
-    const onDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
+    useEffect(() => {
+        const handleDragEnter = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter.current += 1;
+            if (e.dataTransfer?.items && e.dataTransfer.items.length > 0) {
+                setIsDragging(true);
+            }
+        };
 
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const file = e.dataTransfer.files[0];
-            uploadFile(file);
-        }
-    }, []);
+        const handleDragLeave = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter.current -= 1;
+            if (dragCounter.current === 0) {
+                setIsDragging(false);
+            }
+        };
+
+        const handleDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e: DragEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDragging(false);
+            dragCounter.current = 0;
+
+            if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                uploadFile(file);
+            }
+        };
+
+        window.addEventListener('dragenter', handleDragEnter);
+        window.addEventListener('dragleave', handleDragLeave);
+        window.addEventListener('dragover', handleDragOver);
+        window.addEventListener('drop', handleDrop);
+
+        return () => {
+            window.removeEventListener('dragenter', handleDragEnter);
+            window.removeEventListener('dragleave', handleDragLeave);
+            window.removeEventListener('dragover', handleDragOver);
+            window.removeEventListener('drop', handleDrop);
+        };
+    }, [uploadFile]);
 
     const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -76,66 +109,57 @@ export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void
         }
     };
 
+    const isExpanded = isDragging || isHovering || uploading || status !== null;
+
     return (
-        <div className="w-full max-w-xl mx-auto mt-8">
-            <div
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-                className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-colors ${isDragging
-                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                    : "border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600"
-                    }
-        `}
-            >
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={onFileSelect}
-                />
-
-                <div className="flex flex-col items-center gap-4">
-                    <div className="p-4 bg-gray-100 dark:bg-neutral-800 rounded-full">
-                        {uploading ? (
-                            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                        ) : (
-                            <Upload className="w-8 h-8 text-gray-500 dark:text-gray-400" />
-                        )}
+        <>
+            {/* Full screen drop overlay */}
+            {isDragging && (
+                <div className="fixed left-0 right-0 bottom-0 top-16 z-40 bg-background/50 backdrop-blur-sm border-4 border-dashed border-primary m-4 rounded-xl flex items-center justify-center pointer-events-none">
+                    <div className="bg-background p-6 rounded-xl shadow-lg border border-border">
+                        <p className="text-xl font-semibold text-primary">Drop file to upload</p>
                     </div>
-
-                    <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">
-                            {uploading ? "Uploading..." : "Upload a file"}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Drag and drop or click to select
-                        </p>
-                    </div>
-
-                    <Button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        variant="outline"
-                    >
-                        Select File
-                    </Button>
-                </div>
-            </div>
-
-            {status && (
-                <div className={`mt-4 p-4 rounded-lg flex items-center gap-2 ${status.type === "success"
-                    ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                    : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                    }`}>
-                    {status.type === "success" ? (
-                        <CheckCircle className="w-5 h-5" />
-                    ) : (
-                        <XCircle className="w-5 h-5" />
-                    )}
-                    <p>{status.message}</p>
                 </div>
             )}
-        </div>
+
+            <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={onFileSelect}
+            />
+
+            <button
+                className={`fixed bottom-8 right-8 z-50 flex items-center bg-primary text-primary-foreground rounded-full shadow-lg transition-all duration-300 overflow-hidden cursor-pointer hover:shadow-xl h-14 min-w-14 justify-center ${isExpanded ? "px-6 gap-3" : "px-0 gap-0"}`}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                onClick={() => !uploading && fileInputRef.current?.click()}
+                disabled={uploading}
+            >
+                <div className="flex items-center justify-center shrink-0">
+                    {uploading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                    ) : status?.type === "success" ? (
+                        <CheckCircle className="h-6 w-6" />
+                    ) : status?.type === "error" ? (
+                        <XCircle className="h-6 w-6" />
+                    ) : (
+                        <Upload className="h-6 w-6" />
+                    )}
+                </div>
+
+                <div className={`whitespace-nowrap transition-all duration-300 overflow-hidden ${isExpanded ? "max-w-[200px] opacity-100" : "max-w-0 opacity-0"}`}>
+                    {uploading ? (
+                        <span className="font-medium">Uploading...</span>
+                    ) : status ? (
+                        <span className="font-medium">{status.message}</span>
+                    ) : isDragging ? (
+                        <span className="font-medium">Drop to upload</span>
+                    ) : (
+                        <span className="font-medium">Upload file</span>
+                    )}
+                </div>
+            </button>
+        </>
     );
 }

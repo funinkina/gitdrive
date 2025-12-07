@@ -11,9 +11,9 @@ export function Dashboard() {
     };
 
     return (
-        <div className="w-full space-y-8">
+        <div className="w-full">
             <UploadZone onUploadComplete={handleUploadComplete} />
-            <div className="border-t pt-8">
+            <div>
                 <h2 className="text-2xl font-semibold mb-4">Recent Files (Last 30 Days)</h2>
                 <DriveBrowser key={refreshKey} />
             </div>
