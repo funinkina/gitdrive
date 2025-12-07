@@ -5,6 +5,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Footer } from "@/components/footer";
 
 export default async function Home() {
   const session = await auth();
@@ -61,6 +62,7 @@ export default async function Home() {
             <Dashboard />
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
@@ -121,6 +123,9 @@ export default async function Home() {
             Login with GitHub
           </Button>
         </form>
+
+        {/* Footer Badges */}
+        <Footer />
 
       </main>
     </div>
