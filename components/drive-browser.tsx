@@ -81,7 +81,7 @@ export function DriveBrowser() {
                 const thumbPath = `${thumbDir}/${filenameNoExt}.jpg`;
 
                 return (
-                    <div key={file.path} className="border rounded-lg p-4 flex flex-col gap-2 shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-zinc-900">
+                    <div key={file.path} className="border rounded-lg p-4 flex flex-col gap-2 bg-white hover:bg-amber-50 dark:bg-zinc-900">
                         <div className="aspect-video bg-gray-100 dark:bg-zinc-800 rounded-md overflow-hidden flex items-center justify-center relative group">
                             {isImage ? (
                                 <img

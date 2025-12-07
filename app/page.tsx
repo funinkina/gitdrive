@@ -34,7 +34,7 @@ export default async function Home() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 pl-4 border-l border-border">
+              <div className="flex items-center gap-3 pr-4 border-r border-border">
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-sm font-medium leading-none">{session.user.name}</span>
                   <span className="text-xs text-muted-foreground leading-none mt-1">{session.user.email}</span>
@@ -55,7 +55,7 @@ export default async function Home() {
         </header>
 
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-card rounded-xl border border-border shadow-sm p-6">
+          <div className="bg-card rounded-xl border border-border p-6">
             <Dashboard />
           </div>
         </main>
@@ -83,7 +83,7 @@ export default async function Home() {
           {/* Logo and Name */}
           <div className="mb-12">
             <div className="inline-flex items-center justify-center mb-6">
-              <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-sm">
+              <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center">
                 <GitBranch className="w-10 h-10 text-primary-foreground" />
               </div>
             </div>
