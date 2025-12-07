@@ -81,8 +81,8 @@ export function DriveBrowser() {
                 const thumbPath = `${thumbDir}/${filenameNoExt}.jpg`;
 
                 return (
-                    <div key={file.path} className="border rounded-lg p-4 flex flex-col gap-2 bg-white hover:bg-amber-50 dark:bg-zinc-900">
-                        <div className="aspect-video bg-gray-100 dark:bg-zinc-800 rounded-md overflow-hidden flex items-center justify-center relative group">
+                    <div key={file.path} className="border rounded-lg flex flex-col bg-white hover:bg-stone-100 dark:bg-zinc-900">
+                        <div className="aspect-video bg-gray-100 dark:bg-zinc-800 rounded-t-md overflow-hidden flex items-center justify-center relative group">
                             {isImage ? (
                                 <img
                                     src={`/api/file?path=${encodeURIComponent(thumbPath)}`}
@@ -106,7 +106,7 @@ export function DriveBrowser() {
                                 </button>
                             </div>
                         </div>
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start p-2">
                             <div className="overflow-hidden">
                                 <h3 className="font-medium truncate max-w-[200px]" title={file.name}>{file.name}</h3>
                                 <p className="text-xs text-gray-500">{new Date(file.timestamp).toLocaleDateString()}</p>
