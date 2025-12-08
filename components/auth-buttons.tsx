@@ -26,7 +26,7 @@ export function SignOut() {
                 await signOut()
             }}
         >
-            <Button variant="outline" type="submit">Sign Out</Button>
+            <Button variant="outline" type="submit" className="rounded-md">Sign Out</Button>
         </form>
     )
 }

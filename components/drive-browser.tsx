@@ -14,7 +14,11 @@ interface FileMeta {
     ocr_text: string;
 }
 
-export function DriveBrowser() {
+interface DriveBrowserProps {
+    searchQuery?: string;
+}
+
+export function DriveBrowser({ searchQuery }: DriveBrowserProps) {
     const [files, setFiles] = useState<FileMeta[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -23,16 +27,26 @@ export function DriveBrowser() {
         setLoading(true);
         setError(null);
         try {
-            // Default to last 30 days
             const to = new Date();
             const from = new Date();
-            from.setDate(from.getDate() - 30);
+
+            if (searchQuery) {
+                // Search last 10 years if query is present
+                from.setFullYear(from.getFullYear() - 10);
+            } else {
+                // Default to last 30 days
+                from.setDate(from.getDate() - 30);
+            }
 
             const params = new URLSearchParams({
                 from: from.toISOString(),
                 to: to.toISOString(),
                 per: "100",
             });
+
+            if (searchQuery) {
+                params.append("q", searchQuery);
+            }
 
             const res = await fetch(`/api/search?${params}`);
             if (!res.ok) throw new Error("Failed to fetch files");
@@ -47,7 +61,7 @@ export function DriveBrowser() {
 
     useEffect(() => {
         fetchFiles();
-    }, []);
+    }, [searchQuery]);
 
     const handleDelete = async (path: string) => {
         if (!confirm("Are you sure you want to delete this file?")) return;
@@ -69,7 +83,7 @@ export function DriveBrowser() {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-            {files.length === 0 && <p className="col-span-full text-center text-gray-500">No files found in the last 30 days.</p>}
+            {files.length === 0 && <p className="col-span-full text-center text-gray-500">{searchQuery ? "No files found matching your search." : "No files found in the last 30 days."}</p>}
             {files.map((file) => {
                 const isImage = file.mime.startsWith("image/");
 
