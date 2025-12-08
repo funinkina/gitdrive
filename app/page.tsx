@@ -112,7 +112,7 @@ export default async function Home() {
             await signIn("github");
           }}
         >
-          <Button size="lg" className="gap-4 px-4 py-6 text-lg font-medium bg-[#1e293b] hover:bg-[#0f172a] text-white">
+          <Button size="lg" className="gap-4 px-4 py-6 text-lg font-medium cursor-pointer bg-[#1e293b] hover:bg-[#0f172a] text-white">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"

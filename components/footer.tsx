@@ -34,7 +34,7 @@ export async function Footer() {
                 </a>
 
                 <div className="flex items-center px-4 py-2 bg-muted/30 border border-border rounded-full text-sm text-muted-foreground font-mono backdrop-blur-sm">
-                    v{version}
+                    ▲ v{version}
                 </div>
             </div>
         </div>
