@@ -16,10 +16,11 @@ interface FileMeta {
 
 interface DriveBrowserProps {
     searchQuery?: string;
+    dateRange?: { from: Date; to: Date };
     onDeleteComplete?: () => void;
 }
 
-export function DriveBrowser({ searchQuery, onDeleteComplete }: DriveBrowserProps) {
+export function DriveBrowser({ searchQuery, dateRange, onDeleteComplete }: DriveBrowserProps) {
     const [files, setFiles] = useState<FileMeta[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -28,10 +29,13 @@ export function DriveBrowser({ searchQuery, onDeleteComplete }: DriveBrowserProp
         setLoading(true);
         setError(null);
         try {
-            const to = new Date();
-            const from = new Date();
+            let to = new Date();
+            let from = new Date();
 
-            if (searchQuery) {
+            if (dateRange) {
+                from = dateRange.from;
+                to = dateRange.to;
+            } else if (searchQuery) {
                 // Search last 10 years if query is present
                 from.setFullYear(from.getFullYear() - 10);
             } else {
@@ -62,7 +66,7 @@ export function DriveBrowser({ searchQuery, onDeleteComplete }: DriveBrowserProp
 
     useEffect(() => {
         fetchFiles();
-    }, [searchQuery]);
+    }, [searchQuery, dateRange]);
 
     const handleDelete = async (path: string) => {
         if (!confirm("Are you sure you want to delete this file?")) return;
