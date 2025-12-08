@@ -15,6 +15,13 @@ export function UploadZone({ onUploadComplete }: { onUploadComplete?: () => void
         setUploading(true);
         setStatus(null);
 
+        if (file.size > 50 * 1024 * 1024) {
+            setStatus({ type: "error", message: "File too large (max 50MB)" });
+            setTimeout(() => setStatus(null), 5000);
+            setUploading(false);
+            return;
+        }
+
         try {
             // Compute SHA256 client-side
             const buffer = await file.arrayBuffer();

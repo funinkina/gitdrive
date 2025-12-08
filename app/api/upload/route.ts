@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Validate file type and size (Basic check)
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit for example
+    if (file.size > 40 * 1024 * 1024) { // 50MB limit
         return NextResponse.json({ error: "File too large" }, { status: 400 });
     }
 
@@ -57,7 +57,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "SHA256 mismatch" }, { status: 400 });
     }
 
-    const phash = await computePHash(buffer);
+    let phash = "";
+    if (mimeType.startsWith("image/")) {
+        try {
+            phash = await computePHash(buffer);
+        } catch (e) {
+            console.warn("Failed to compute pHash", e);
+        }
+    }
 
     // 3. Create thumbnail
     let thumbnailBuffer: Buffer | null = null;
