@@ -16,6 +16,7 @@ model User {
   sessions      Session[]
   repoName      String?
   repoOwner     String?
+  storageUsed   Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

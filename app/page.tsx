@@ -9,9 +9,10 @@ import { Footer } from "@/components/footer";
 
 export default async function Home() {
   const session = await auth();
+  let user = null;
 
   if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
+    user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
 
@@ -59,7 +60,7 @@ export default async function Home() {
 
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-card rounded-xl border border-border p-6">
-            <Dashboard />
+            <Dashboard initialStorageUsed={user?.storageUsed || 0} />
           </div>
         </main>
         <Footer />

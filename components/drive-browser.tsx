@@ -16,9 +16,10 @@ interface FileMeta {
 
 interface DriveBrowserProps {
     searchQuery?: string;
+    onDeleteComplete?: () => void;
 }
 
-export function DriveBrowser({ searchQuery }: DriveBrowserProps) {
+export function DriveBrowser({ searchQuery, onDeleteComplete }: DriveBrowserProps) {
     const [files, setFiles] = useState<FileMeta[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -73,6 +74,9 @@ export function DriveBrowser({ searchQuery }: DriveBrowserProps) {
             if (!res.ok) throw new Error("Failed to delete");
             // Refresh
             fetchFiles();
+            if (onDeleteComplete) {
+                onDeleteComplete();
+            }
         } catch (e) {
             alert("Error deleting file");
         }

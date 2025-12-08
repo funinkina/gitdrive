@@ -19,6 +19,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+        where: { email: session.user.email! },
+    });
+
+    if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File;
     const tags = formData.get("tags") as string; // Comma separated or JSON
@@ -27,6 +35,12 @@ export async function POST(req: NextRequest) {
 
     if (!file) {
         return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // Check storage quota (1GB)
+    const MAX_STORAGE = 1024 * 1024 * 1024; // 1GB
+    if ((user.storageUsed || 0) + file.size > MAX_STORAGE) {
+        return NextResponse.json({ error: "Storage quota exceeded (1GB limit)" }, { status: 400 });
     }
 
     // 1. Validate file type and size (Basic check)
@@ -92,11 +106,8 @@ export async function POST(req: NextRequest) {
     };
 
     // 6. Upload to GitHub
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email! },
-    });
-
-    if (!user || !user.repoOwner || !user.repoName) {
+    // User already fetched above
+    if (!user.repoOwner || !user.repoName) {
         return NextResponse.json(
             { error: "User repository not configured" },
             { status: 400 }
@@ -123,6 +134,12 @@ export async function POST(req: NextRequest) {
             filesToUpload,
             `Upload ${filename}`
         );
+
+        // Update storage usage
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { storageUsed: { increment: file.size } },
+        });
 
         return NextResponse.json({
             success: true,

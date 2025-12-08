@@ -118,6 +118,26 @@ export async function DELETE(req: NextRequest) {
     const metaPath = `meta/${dirPath}/${filenameNoExt}.json`;
     const thumbPath = `thumbs/${dirPath}/${filenameNoExt}.jpg`;
 
+    // Fetch metadata to get size for quota adjustment
+    let fileSize = 0;
+    try {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${metaPath}`;
+        const res = await fetch(apiUrl, {
+            headers: {
+                Authorization: `token ${session.accessToken}`,
+                Accept: "application/vnd.github.v3.raw"
+            }
+        });
+        if (res.ok) {
+            const meta = await res.json();
+            if (typeof meta.size === 'number') {
+                fileSize = meta.size;
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to fetch metadata for size adjustment", e);
+    }
+
     try {
         await deleteFromRepo(
             session.accessToken,
@@ -126,6 +146,14 @@ export async function DELETE(req: NextRequest) {
             [filePath, metaPath, thumbPath],
             `Delete ${filename}`
         );
+
+        if (fileSize > 0) {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { storageUsed: { decrement: fileSize } },
+            });
+        }
+
         return NextResponse.json({ success: true });
     } catch (e: any) {
         console.error("Delete failed", e);
