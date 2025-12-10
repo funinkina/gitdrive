@@ -44,8 +44,8 @@ export function SearchBar({ onSearch }: SearchBarProps) {
         <div ref={containerRef} className="relative w-full max-w-2xl mx-auto mb-12 z-50">
             <div
                 className={`
-                    relative flex flex-col bg-card border border-border transition-all duration-200 
-                    ${showFilters ? 'rounded-3xl shadow-lg ring-1 ring-primary/50' : 'rounded-full hover:ring-1 hover:ring-primary/20'}
+                    relative flex flex-col bg-card border border-border transition-all duration-300 ease-in-out
+                    ${showFilters ? 'rounded-[28px] shadow-lg ring-1 ring-primary/50' : 'rounded-[28px] hover:ring-1 hover:ring-primary/20'}
                 `}
             >
                 <div className="relative flex items-center h-14 shrink-0">
