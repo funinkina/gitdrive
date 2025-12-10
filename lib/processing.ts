@@ -2,6 +2,7 @@ import sharp from "sharp";
 import { createWorker } from "tesseract.js";
 import crypto from "node:crypto";
 import path from "path";
+import fs from "node:fs";
 
 export async function generateThumbnail(buffer: Buffer): Promise<Buffer> {
     return sharp(buffer)
@@ -59,8 +60,23 @@ export async function runOCR(buffer: Buffer, mimeType: string): Promise<string> 
     }
 
     try {
+        const cachePath = "/tmp";
+        const lang = "eng";
+        const trainedDataPath = path.join(cachePath, `${lang}.traineddata`);
+
+        // Copy trained data to /tmp if it exists in project root but not in /tmp
+        // This is necessary for Vercel serverless environment where only /tmp is writable
+        if (!fs.existsSync(trainedDataPath)) {
+            const sourcePath = path.join(process.cwd(), `${lang}.traineddata`);
+            if (fs.existsSync(sourcePath)) {
+                fs.copyFileSync(sourcePath, trainedDataPath);
+            }
+        }
+
         const worker = await createWorker("eng", 1, {
-            workerPath: path.join(process.cwd(), "node_modules/tesseract.js/src/worker-script/node/index.js"),
+            // Use the minified worker from dist to avoid "Cannot find module" errors with src files
+            workerPath: path.join(process.cwd(), "node_modules/tesseract.js/dist/worker.min.js"),
+            cachePath,
         });
         const ret = await worker.recognize(buffer);
         await worker.terminate();
