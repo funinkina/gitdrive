@@ -78,11 +78,14 @@ export async function runOCR(buffer: Buffer, mimeType: string): Promise<string> 
             workerPath: path.join(process.cwd(), "node_modules/tesseract.js/dist/worker.min.js"),
             cachePath,
         });
-        const ret = await worker.recognize(buffer);
-        await worker.terminate();
 
-        // Truncate to 1024 chars as per plan
-        return ret.data.text.substring(0, 1024);
+        try {
+            const ret = await worker.recognize(buffer);
+            // Truncate to 1024 chars as per plan
+            return ret.data.text.substring(0, 1024);
+        } finally {
+            await worker.terminate();
+        }
     } catch (error) {
         console.error("OCR failed:", error);
         return "";

@@ -77,7 +77,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Run OCR
-    const ocrText = await runOCR(buffer, mimeType);
+    let ocrText = "";
+    try {
+        ocrText = await runOCR(buffer, mimeType);
+    } catch (error) {
+        console.error("OCR failed during upload:", error);
+    }
 
     // 5. Prepare paths and metadata
     const now = new Date();
